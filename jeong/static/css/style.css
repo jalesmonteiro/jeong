@@ -1,0 +1,47 @@
+:root {
+    --cor-primaria: #240046;
+    --bg-principal: #fff;
+    --texto-principal: #222;
+    --bg-footer: #f8f9fa;
+    --texto-footer: #6c757d;
+}
+
+[data-theme="dark"] {
+    --bg-principal: #18122B;
+    --texto-principal: #f3f3f3;
+    --bg-footer: #232136;
+    --texto-footer: #b6b6b6;
+}
+
+/* Navbar e footer em modo escuro */
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .navbar-dark {
+    background-color: #1a1333 !important;
+}
+[data-theme="dark"] .navbar .navbar-brand,
+[data-theme="dark"] .navbar .nav-link {
+    color: #f3f3f3 !important;
+}
+[data-theme="dark"] footer {
+    background-color: var(--bg-footer) !important;
+    color: var(--texto-footer) !important;
+}
+
+/* Cards e containers */
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .card,
+[data-theme="dark"] .rounded-4 {
+    background-color: #232136 !important;
+    color: #f3f3f3 !important;
+    border-color: #2a235d !important;
+}
+
+/* Botão tema claro/escuro */
+#theme-toggle {
+    min-width: 120px;
+}
+
+/* Ajuste para links */
+a.text-[var(--cor-primaria)] {
+    color: var(--cor-primaria) !important;
+}

@@ -1,0 +1,48 @@
+{% if page_obj.has_other_pages %}
+<nav class="flex justify-center mt-6" aria-label="Paginação">
+    <ul class="inline-flex items-center space-x-1">
+        {% if page_obj.has_previous %}
+            <li>
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="px-3 py-1 rounded-l bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-[var(--cor-primaria)] hover:text-white transition"
+                   aria-label="Página anterior">
+                    &laquo;
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <span class="px-3 py-1 rounded-l bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed">&laquo;</span>
+            </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li>
+                    <span class="px-3 py-1 bg-[var(--cor-primaria)] text-white font-semibold rounded transition">{{ num }}</span>
+                </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li>
+                    <a href="?page={{ num }}"
+                       class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-[var(--cor-primaria)] hover:text-white transition">
+                        {{ num }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li>
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="px-3 py-1 rounded-r bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-[var(--cor-primaria)] hover:text-white transition"
+                   aria-label="Próxima página">
+                    &raquo;
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <span class="px-3 py-1 rounded-r bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed">&raquo;</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

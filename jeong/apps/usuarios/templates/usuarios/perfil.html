@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil • Jeong{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="bg-white rounded-4 shadow p-4 p-md-5">
+        <h2 class="mb-4 text-center text-[var(--cor-primaria)] fw-bold">Meu Perfil</h2>
+
+        <div class="d-flex flex-column align-items-center mb-4">
+          <img src="{{ perfil.avatar.url|default:'{% static \"img/default_avatar.png\" %}' }}" alt="Avatar"
+               class="rounded-circle mb-3" style="width: 96px; height: 96px; object-fit: cover;">
+          <h4 class="fw-bold mb-1">{{ perfil.nome_completo|default:user.get_full_name }}</h4>
+          <span class="text-muted small">{{ perfil.email|default:user.email }}</span>
+        </div>
+
+        <ul class="list-group list-group-flush mb-4">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Pontos acumulados
+            <span class="badge bg-primary rounded-pill">{{ perfil.pontos|default:0 }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Partidas jogadas
+            <span class="badge bg-secondary rounded-pill">{{ perfil.partidas_jogadas|default:0 }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Vitórias
+            <span class="badge bg-success rounded-pill">{{ perfil.vitorias|default:0 }}</span>
+          </li>
+        </ul>
+
+        <div class="text-center">
+          <a href="{% url 'usuarios:logout' %}" class="btn btn-outline-danger mt-3">Sair da conta</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
