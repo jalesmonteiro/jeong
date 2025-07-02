@@ -1,3 +1,25 @@
 from django.contrib import admin
+from .models.categoria import Categoria
+from .models.palavra import Palavra
+from .models.partida import Partida
 
-# Register your models here.
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'descricao')
+    search_fields = ('nome',)
+
+@admin.register(Palavra)
+class PalavraAdmin(admin.ModelAdmin):
+    list_display = ('texto', 'idioma', 'categoria', 'dificuldade')
+    list_filter = ('idioma', 'categoria', 'dificuldade')
+    search_fields = ('texto',)
+
+@admin.register(Partida)
+class PartidaAdmin(admin.ModelAdmin):
+    list_display = (
+        'usuario', 'palavra', 'status', 'tentativas_restantes',
+        'pontuacao', 'data_inicio', 'data_fim'
+    )
+    list_filter = ('status', 'data_inicio', 'data_fim')
+    search_fields = ('usuario__email', 'palavra__texto')
+    readonly_fields = ('data_inicio', 'data_fim')

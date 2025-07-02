@@ -16,7 +16,7 @@
 /* Navbar e footer em modo escuro */
 [data-theme="dark"] .navbar,
 [data-theme="dark"] .navbar-dark {
-    background-color: #1a1333 !important;
+    background-color: var(--bg-footer) !important;
 }
 [data-theme="dark"] .navbar .navbar-brand,
 [data-theme="dark"] .navbar .nav-link {
@@ -44,4 +44,18 @@
 /* Ajuste para links */
 a.text-[var(--cor-primaria)] {
     color: var(--cor-primaria) !important;
+}
+
+/* Ajuste para lista de estatísticas no perfil */
+.perfil-list-group .list-group-item {
+    background-color: var(--bg-principal) !important;
+    color: var(--texto-principal) !important;
+    border-color: rgba(255,255,255,0.08); /* linha divisória sutil no dark */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+[data-theme="dark"] .perfil-list-group .list-group-item {
+    background-color: #232136 !important;
+    color: #f3f3f3 !important;
+    border-color: #2a235d !important;
 }

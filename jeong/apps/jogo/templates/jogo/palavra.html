@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Palavra • Jeong{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="bg-white rounded-4 shadow p-4 p-md-5" style="background-color: var(--bg-principal); color: var(--texto-principal);">
+        <h2 class="mb-4 text-center fw-bold" style="color: var(--cor-primaria);">Detalhes da Palavra</h2>
+
+        <dl class="row">
+          <dt class="col-sm-4">Texto</dt>
+          <dd class="col-sm-8">{{ palavra.texto }}</dd>
+
+          <dt class="col-sm-4">Idioma</dt>
+          <dd class="col-sm-8">{{ palavra.idioma }}</dd>
+
+          <dt class="col-sm-4">Categoria</dt>
+          <dd class="col-sm-8">
+            {% if palavra.categoria %}
+              {{ palavra.categoria.nome }}
+            {% else %}
+              <span class="text-muted">Sem categoria</span>
+            {% endif %}
+          </dd>
+
+          <dt class="col-sm-4">Dificuldade</dt>
+          <dd class="col-sm-8">{{ palavra.get_dificuldade_display }}</dd>
+        </dl>
+
+        <div class="text-center mt-4">
+          <a href="{% url 'jogo:palavra_list' %}" class="btn btn-outline-primary">Voltar à lista</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

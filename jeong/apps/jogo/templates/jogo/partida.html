@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Jogo da Forca • Jeong{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="bg-white rounded-4 shadow p-4 p-md-5" style="background-color: var(--bg-principal); color: var(--texto-principal);">
+        <h2 class="mb-4 text-center fw-bold" style="color: var(--cor-primaria);">Jogo da Forca</h2>
+
+        <!-- Status da partida -->
+        <div class="mb-3 text-center">
+          <span class="badge bg-info text-dark fs-6">
+            {{ partida.get_status_display }}
+          </span>
+        </div>
+
+        <!-- Sílabas: traços e revelação -->
+        <div class="mb-2 text-center fs-1 fw-bold" style="letter-spacing: 0.5em;">
+          {% for silaba in silabas_exibidas %}
+            {% if silaba == '_' %}
+              <span style="border-bottom: 3px solid #888; display: inline-block; width: 1.5em; height: 1.2em;">&nbsp;</span>
+            {% else %}
+              <span style="border-bottom: 3px solid #888; display: inline-block; width: 1.5em; height: 1.2em;">{{ silaba }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- Letras (jamo): traços e revelação -->
+        <div class="mb-4 text-center fs-3" style="letter-spacing: 0.4em;">
+          {% for letra in letras_exibidas %}
+            {% if letra == '_' %}
+              <span style="border-bottom: 2px solid #ccc; display: inline-block; width: 1em; height: 1em;">&nbsp;</span>
+            {% else %}
+              <span style="border-bottom: 2px solid #ccc; display: inline-block; width: 1em; height: 1em;">{{ letra }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- Letras já tentadas -->
+        <div class="mb-3 text-center">
+          <strong>Letras tentadas:</strong>
+          {% if letras_tentadas %}
+            <span class="ms-2">{{ letras_tentadas|join:", " }}</span>
+          {% else %}
+            <span class="ms-2 text-muted">Nenhuma</span>
+          {% endif %}
+        </div>
+
+        <!-- Tentativas restantes -->
+        <div class="mb-4 text-center">
+          <span class="badge bg-warning text-dark fs-6">
+            Tentativas restantes: {{ partida.tentativas_restantes }}
+          </span>
+        </div>
+
+        <!-- Formulário para tentar uma letra (apenas se em andamento) -->
+        {% if partida.status == 'em_andamento' %}
+          {% if partida.tipo_entrada == 'digitacao' %}
+              {% include "jogo/parcial/_entrada_digitacao.html" %}
+          {% elif partida.tipo_entrada == 'blocos' %}
+              {% include "jogo/parcial/_entrada_blocos.html" %}
+          {% elif partida.tipo_entrada == 'teclado' %}
+              {% include "jogo/parcial/_entrada_teclado.html" %}
+          {% endif %}
+        {% endif %}
+
+        <!-- Mensagens de vitória/derrota -->
+        {% if partida.status == 'vitoria' %}
+          <div class="alert alert-success text-center fw-bold">
+            Parabéns! Você acertou a palavra <span class="text-success">{{ palavra.texto }}</span>!
+            <br>Pontuação: <span class="fw-bold">{{ partida.pontuacao }}</span>
+          </div>
+        {% elif partida.status == 'derrota' %}
+          <div class="alert alert-danger text-center fw-bold">
+            Que pena! A palavra era <span class="text-danger">{{ palavra.texto }}</span>.
+            <br>Pontuação: <span class="fw-bold">{{ partida.pontuacao }}</span>
+          </div>
+        {% endif %}
+
+        <!-- Botão para nova partida -->
+        <div class="text-center mt-4">
+          <a href="{% url 'jogo:partida_nova' %}" class="btn btn-outline-primary">Nova Partida</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

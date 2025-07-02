@@ -1,0 +1,7 @@
+<form method="post" class="mb-4 text-center">
+  {% csrf_token %}
+  <div class="input-group justify-content-center">
+    <input type="text" name="letra" maxlength="1" class="form-control w-auto text-center" style="max-width:60px;" placeholder="Letra" required autofocus>
+    <button type="submit" class="btn btn-primary ms-2" style="background-color: var(--cor-primaria); border: none;">Tentar</button>
+  </div>
+</form>

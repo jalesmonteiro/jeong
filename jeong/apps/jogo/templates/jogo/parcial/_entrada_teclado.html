@@ -1,0 +1,10 @@
+<form method="post" class="mb-4 text-center">
+  {% csrf_token %}
+  <!-- Aqui você pode montar um teclado virtual com JS/CSS conforme o layout desejado -->
+  <div id="teclado-virtual"></div>
+  <input type="hidden" name="letra" id="letra-escolhida">
+  <button type="submit" class="btn btn-primary mt-2">Tentar</button>
+</form>
+<script>
+  // JS para montar o teclado virtual e preencher #letra-escolhida
+</script>

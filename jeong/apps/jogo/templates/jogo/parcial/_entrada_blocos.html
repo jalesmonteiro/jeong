@@ -1,0 +1,31 @@
+<form method="post" class="mb-4 text-center">
+  {% csrf_token %}
+  <div class="mb-2">
+    <strong>Consoantes Simples:</strong><br>
+    {% for letra in consoantes_simples %}
+      <button type="submit" name="letra" value="{{ letra }}" class="btn btn-outline-secondary btn-sm m-1"
+        {% if letra in letras_tentadas %}disabled{% endif %}>{{ letra }}</button>
+    {% endfor %}
+  </div>
+  <div class="mb-2">
+    <strong>Consoantes Duplas:</strong><br>
+    {% for letra in consoantes_duplas %}
+      <button type="submit" name="letra" value="{{ letra }}" class="btn btn-outline-secondary btn-sm m-1"
+        {% if letra in letras_tentadas %}disabled{% endif %}>{{ letra }}</button>
+    {% endfor %}
+  </div>
+  <div class="mb-2">
+    <strong>Vogais Simples:</strong><br>
+    {% for letra in vogais_simples %}
+      <button type="submit" name="letra" value="{{ letra }}" class="btn btn-outline-primary btn-sm m-1"
+        {% if letra in letras_tentadas %}disabled{% endif %}>{{ letra }}</button>
+    {% endfor %}
+  </div>
+  <div class="mb-2">
+    <strong>Vogais Compostas:</strong><br>
+    {% for letra in vogais_compostas %}
+      <button type="submit" name="letra" value="{{ letra }}" class="btn btn-outline-primary btn-sm m-1"
+        {% if letra in letras_tentadas %}disabled{% endif %}>{{ letra }}</button>
+    {% endfor %}
+  </div>
+</form>
