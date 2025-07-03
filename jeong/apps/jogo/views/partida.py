@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -9,7 +10,23 @@ from ..models.palavra import Palavra
 from ..models.partida import Partida
 from ..models.categoria import Categoria
 
-# Função para dividir jamo proporcionalmente pelas sílabas
+# Mapeamento das consoantes duplas
+DUPLAS_PARA_SIMPLES = {
+    'ㄲ': 'ㄱ',
+    'ㄸ': 'ㄷ',
+    'ㅃ': 'ㅂ',
+    'ㅆ': 'ㅅ',
+    'ㅉ': 'ㅈ',
+}
+SIMPLES_PARA_DUPLAS = {v: k for k, v in DUPLAS_PARA_SIMPLES.items()}
+
+def is_jamo(char):
+    """Retorna True se o caractere for um jamo coreano isolado."""
+    if len(char) != 1:
+        return False
+    code = ord(char)
+    return 0x3130 <= code <= 0x318F
+
 def silabas_reveladas(texto, jamo, letras_tentadas):
     """
     Retorna uma lista: sílaba se todas as letras dela já foram tentadas, senão '_'
@@ -26,45 +43,37 @@ def silabas_reveladas(texto, jamo, letras_tentadas):
         n = base + (1 if i < extra else 0)
         silaba_jamo = jamo_list[idx:idx+n]
         idx += n
-        if all(l in letras_tentadas for l in silaba_jamo):
+        # Checa se todos os jamos da sílaba foram tentados (com lógica de duplas)
+        if all(jamo_revelado(j, jamo_list, i, letras_tentadas) for j in silaba_jamo):
             resultado.append(silaba)
         else:
             resultado.append('_')
     return resultado
 
-def is_jamo(char):
-    """Retorna True se o caractere for um jamo coreano isolado."""
-    if len(char) != 1:
-        return False
-    code = ord(char)
-    # Jamo compatíveis (usados para digitação): 0x3130–0x318F
-    return 0x3130 <= code <= 0x318F
-
-# Função para dividir o jamo conforme as sílabas do texto
-def split_jamo_por_silaba(texto, jamo):
+def jamo_revelado(j, jamo_list, idx, letras_tentadas):
     """
-    Divide a string jamo em grupos conforme o número de sílabas do texto.
-    Exemplo: texto="학교", jamo="ㅎㅏㄱㄱㅛ" -> [("학", "ㅎㅏㄱ"), ("교", "ㄱㅛ")]
+    Retorna True se o jamo deve ser revelado, considerando duplas e simples.
     """
-    # Aqui, usamos o unicodedata para decompor, mas como já temos o jamo salvo, 
-    # só precisamos dividir proporcionalmente.
-    # O ideal é que, ao cadastrar a palavra, você salve também o "mapeamento" (quantos jamo por sílaba).
-    # Para exemplo, vamos assumir 2 jamo para cada sílaba exceto se a palavra for cadastrada diferente.
-    silabas = list(texto)
-    jamo_list = list(jamo)
-    resultado = []
-    idx = 0
-    for silaba in silabas:
-        # Aqui, você pode melhorar para pegar a quantidade certa de jamo por sílaba.
-        # Para exemplo, vamos assumir 2 jamo por sílaba, exceto se faltar menos.
-        if idx + 2 <= len(jamo_list):
-            silaba_jamo = jamo_list[idx:idx+2]
-            idx += 2
-        else:
-            silaba_jamo = jamo_list[idx:]
-            idx = len(jamo_list)
-        resultado.append((silaba, silaba_jamo))
-    return resultado
+    # Verifica se é parte de uma dupla
+    if j in DUPLAS_PARA_SIMPLES.values():
+        # Simples: só revela se não for parte de dupla
+        # Ex: não revela o primeiro 'ㅂ' em 'ㅂㅂ' se só tentou 'ㅂ'
+        if idx > 0 and jamo_list[idx-1] == j:
+            # É o segundo de uma dupla
+            return False
+        # Verifica se a próxima também é igual (dupla)
+        if idx+1 < len(jamo_list) and jamo_list[idx+1] == j:
+            # É o primeiro de uma dupla, só revela se a dupla foi tentada
+            dupla = SIMPLES_PARA_DUPLAS.get(j)
+            return dupla in letras_tentadas
+        # Simples isolado
+        return j in letras_tentadas
+    elif j in DUPLAS_PARA_SIMPLES:
+        # Dupla: só revela se a dupla foi tentada
+        return j in letras_tentadas
+    else:
+        # Vogais e outros jamos
+        return j in letras_tentadas
 
 @login_required
 def partida_nova_view(request):
@@ -133,6 +142,7 @@ def partida_nova_view(request):
     })
 
 @login_required
+@login_required
 def partida_view(request):
     try:
         partida = Partida.objects.get(usuario=request.user, status='em_andamento')
@@ -140,10 +150,9 @@ def partida_view(request):
         return redirect('jogo:partida_nova')
     
     palavra = partida.palavra
-    letras_tentadas = set(partida.letras_tentadas)
-    status_anterior = partida.status
+    letras_tentadas = list(OrderedDict.fromkeys(partida.letras_tentadas))
 
-    # Processa tentativa de letra (jamo)
+    # --- Lógica de tentativa corrigida ---
     if partida.status == 'em_andamento' and request.method == 'POST':
         letra = request.POST.get('letra', '').strip()
         if not is_jamo(letra):
@@ -153,9 +162,34 @@ def partida_view(request):
                 messages.warning(request, "Digite apenas uma letra coreana válida (jamo).")
                 return redirect('jogo:partida_view')
         if letra and letra not in letras_tentadas:
-            letras_tentadas.add(letra)
-            partida.letras_tentadas = ''.join(sorted(letras_tentadas))
-            if letra in palavra.jamo:
+            partida.letras_tentadas += letra
+            letras_tentadas = list(OrderedDict.fromkeys(partida.letras_tentadas))
+
+            # Nova lógica para verificar se acertou algo
+            acertou = False
+            jamo_list = list(palavra.jamo)
+            if letra in DUPLAS_PARA_SIMPLES:
+                # Tentou uma dupla: verifica se existe a sequência simples+simples
+                simples = DUPLAS_PARA_SIMPLES[letra]
+                for i in range(len(jamo_list)-1):
+                    if jamo_list[i] == simples and jamo_list[i+1] == simples:
+                        acertou = True
+                        break
+            elif letra in SIMPLES_PARA_DUPLAS:
+                # Tentou uma simples: só acerta se houver simples isolada, não parte de dupla
+                for i, j in enumerate(jamo_list):
+                    if j == letra:
+                        # Não pode ser parte de uma dupla
+                        if not ((i+1 < len(jamo_list) and jamo_list[i+1] == letra) or
+                                (i > 0 and jamo_list[i-1] == letra)):
+                            acertou = True
+                            break
+            else:
+                # Vogais e outros jamos
+                if letra in jamo_list:
+                    acertou = True
+
+            if acertou:
                 silabas_exibidas = silabas_reveladas(palavra.texto, palavra.jamo, letras_tentadas)
                 if '_' not in silabas_exibidas:
                     partida.status = 'vitoria'
@@ -168,10 +202,8 @@ def partida_view(request):
                 else:
                     partida.tentativas_restantes -= 1
             partida.save()
-        # Atualize variáveis do contexto após possível modificação
-        letras_tentadas = set(partida.letras_tentadas)
 
-    # Prepara para exibição
+    # Prepara para exibição (igual ao seu código)
     silabas_exibidas = silabas_reveladas(palavra.texto, palavra.jamo, letras_tentadas)
     letras_exibidas = [l if l in letras_tentadas else '_' for l in palavra.jamo]
     linha1 = [
@@ -208,8 +240,32 @@ def partida_view(request):
         {'key': 'M', 'normal': 'ㅡ', 'shift': '-'},
         {'key': 'SHIFT-RIGHT', 'normal': 'SHIFT', 'shift': 'SHIFT'},
     ]
-    letras_corretas = set(l for l in letras_tentadas if l in palavra.jamo)
-    letras_erradas = letras_tentadas - letras_corretas
+    # Atualize letras_corretas e letras_erradas com a nova lógica
+    letras_corretas = set()
+    letras_erradas = set()
+    jamo_list = list(palavra.jamo)
+    for l in letras_tentadas:
+        acertou = False
+        if l in DUPLAS_PARA_SIMPLES:
+            simples = DUPLAS_PARA_SIMPLES[l]
+            for i in range(len(jamo_list)-1):
+                if jamo_list[i] == simples and jamo_list[i+1] == simples:
+                    acertou = True
+                    break
+        elif l in SIMPLES_PARA_DUPLAS:
+            for i, j in enumerate(jamo_list):
+                if j == l:
+                    if not ((i+1 < len(jamo_list) and jamo_list[i+1] == l) or
+                            (i > 0 and jamo_list[i-1] == l)):
+                        acertou = True
+                        break
+        else:
+            if l in jamo_list:
+                acertou = True
+        if acertou:
+            letras_corretas.add(l)
+        else:
+            letras_erradas.add(l)
 
     context = {
         'partida': partida,
@@ -228,7 +284,6 @@ def partida_view(request):
         'linha3': linha3,
     }
 
-    # AJAX: retorna só o HTML da área dinâmica e o status da partida
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         html = render_to_string("jogo/parcial/_partida_conteudo.html", context, request=request)
         return JsonResponse({
@@ -239,23 +294,17 @@ def partida_view(request):
             'partida_id': partida.pk
         })
 
-    # Se a partida terminou (vitória/derrota), redirecione para a tela de detalhe
     if partida.status != 'em_andamento':
         return redirect('jogo:partida_detalhe', pk=partida.pk)
 
-    # GET normal: renderiza a página inteira
     return render(request, 'jogo/partida.html', context)
 
 @login_required
 def partida_detalhe_view(request, pk):
     partida = get_object_or_404(Partida, pk=pk, usuario=request.user)
     if partida.status == 'em_andamento':
-        # Se tentar acessar uma partida em andamento por ID, redireciona para a view principal
         return redirect('jogo:partida_view')
-    # Só exibe partidas encerradas (vitória/derrota/cancelada)
-    # Aqui só exibe, não executa lógica de jogo
     context = {
         'partida': partida,
-        # outros dados para exibição do histórico...
     }
     return render(request, 'jogo/partida_historico.html', context)
