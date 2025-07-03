@@ -18,10 +18,12 @@
 [data-theme="dark"] .navbar-dark {
     background-color: var(--bg-footer) !important;
 }
+
 [data-theme="dark"] .navbar .navbar-brand,
 [data-theme="dark"] .navbar .nav-link {
     color: #f3f3f3 !important;
 }
+
 [data-theme="dark"] footer {
     background-color: var(--bg-footer) !important;
     color: var(--texto-footer) !important;
@@ -42,7 +44,7 @@
 }
 
 /* Ajuste para links */
-a.text-[var(--cor-primaria)] {
+a.cor-primaria {
     color: var(--cor-primaria) !important;
 }
 
@@ -50,7 +52,8 @@ a.text-[var(--cor-primaria)] {
 .perfil-list-group .list-group-item {
     background-color: var(--bg-principal) !important;
     color: var(--texto-principal) !important;
-    border-color: rgba(255,255,255,0.08); /* linha divisória sutil no dark */
+    border-color: rgba(255, 255, 255, 0.08);
+    /* linha divisória sutil no dark */
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -58,4 +61,33 @@ a.text-[var(--cor-primaria)] {
     background-color: #232136 !important;
     color: #f3f3f3 !important;
     border-color: #2a235d !important;
+}
+
+.tecla-jamo,
+.tecla-shift {
+    min-width: 40px;
+    /* Ajuste para o tamanho desejado */
+    width: 40px;
+    max-width: 40px;
+    text-align: center;
+    padding: 0.15em 0;
+    font-size: 1.2em;
+    position: relative;
+    /* Para evitar que o botão fique muito pequeno se o conteúdo for só um traço */
+    box-sizing: border-box;
+    border-width: 2px;
+}
+
+.tecla-shift {
+    min-width: 60px;
+    width: 60px;
+    max-width: 60px;
+}
+
+.tecla-correta {
+    border: 2px solid #28a745 !important; /* verde */
+}
+
+.tecla-errada {
+    border: 2px solid #dc3545 !important; /* vermelho */
 }

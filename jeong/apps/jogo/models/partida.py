@@ -31,6 +31,7 @@ class Partida(models.Model):
         choices=TIPO_ENTRADA_CHOICES,
         default='digitacao'
     )
+    dificuldade = models.PositiveSmallIntegerField('Dificuldade', default=1)
     tentativas_restantes = models.PositiveSmallIntegerField('Tentativas restantes', default=6)
     letras_tentadas = models.CharField('Letras tentadas', max_length=50, blank=True, default='')
     status = models.CharField('Status', max_length=20, choices=STATUS_CHOICES, default='em_andamento')

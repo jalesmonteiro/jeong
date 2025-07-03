@@ -1,10 +1,55 @@
-<form method="post" class="mb-4 text-center">
+<form method="post" class="mb-4 text-center" id="form-teclado">
   {% csrf_token %}
-  <!-- Aqui você pode montar um teclado virtual com JS/CSS conforme o layout desejado -->
-  <div id="teclado-virtual"></div>
   <input type="hidden" name="letra" id="letra-escolhida">
-  <button type="submit" class="btn btn-primary mt-2">Tentar</button>
+
+  <div id="teclado-virtual">
+    <!-- Linha 1 -->
+    <div class="linha-teclado">
+      {% for key in linha1 %}
+        <button type="button"
+            class="btn btn-outline-secondary btn-sm m-1 tecla-jamo"
+            data-key="{{ key.key }}"
+            data-normal="{{ key.normal }}"
+            data-shift="{{ key.shift }}">
+            <span class="letra-normal">{{ key.normal }}</span>
+            <span class="letra-shift" style="display:none;">{{ key.shift }}</span>
+        </button>
+      {% endfor %}
+    </div>
+    <!-- Linha 2 -->
+    <div class="linha-teclado">
+      {% for key in linha2 %}
+        <button type="button"
+            class="btn btn-outline-secondary btn-sm m-1 tecla-jamo"
+            data-key="{{ key.key }}"
+            data-normal="{{ key.normal }}"
+            data-shift="{{ key.shift }}">
+            <span class="letra-normal">{{ key.normal }}</span>
+            <span class="letra-shift" style="display:none;">{{ key.shift }}</span>
+        </button>
+
+      {% endfor %}
+    </div>
+    <!-- Linha 3 -->
+    <div class="linha-teclado">
+      {% for key in linha3 %}
+        {% if key.normal == 'SHIFT' %}
+          <button type="button" class="btn btn-secondary btn-sm m-1 tecla-shift" id="btn-shift-{{ key.key }}">
+            Shift
+          </button>
+        {% else %}
+          <button type="button"
+            class="btn btn-outline-secondary btn-sm m-1 tecla-jamo"
+            data-key="{{ key.key }}"
+            data-normal="{{ key.normal }}"
+            data-shift="{{ key.shift }}">
+            <span class="letra-normal">{{ key.normal }}</span>
+            <span class="letra-shift" style="display:none;">{{ key.shift }}</span>
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+  </div>
 </form>
-<script>
-  // JS para montar o teclado virtual e preencher #letra-escolhida
-</script>
+

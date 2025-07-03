@@ -19,6 +19,7 @@ class PerfilUsuario(models.Model):
     pontos = models.PositiveIntegerField(default=0)
     partidas_jogadas = models.PositiveIntegerField(default=0)
     vitorias = models.PositiveIntegerField(default=0)
+    tema = models.CharField(max_length=10, choices=[('light', 'Claro'), ('dark', 'Escuro')], default='light')
     # Adicione outros campos conforme a gamificação: conquistas, temas, etc.
 
     def __str__(self):

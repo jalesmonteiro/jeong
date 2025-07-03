@@ -1,7 +1,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="pt-br" class="h-full" data-theme="light">
+<html lang="pt-br" class="h-full" data-theme="{{ request.user.perfilusuario.tema|default:'light' }}">
 
 <head>
   <meta charset="UTF-8" />
@@ -30,7 +30,7 @@
         {% if user.is_authenticated %}
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'jogo:partida_escolha' %}">Nova Partida</a>
+            <a class="nav-link" href="{% url 'jogo:partida_nova' %}">Nova Partida</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="% url 'gamificacao:ranking' %}">Ranking</a>
@@ -66,6 +66,11 @@
     style="background-color: var(--bg-footer, #f8f9fa); color: var(--texto-footer, #6c757d);">
     &copy; {{ year|default:2025 }} Jeong • Jogo da Forca Coreano
   </footer>
+
+  <!-- JS -->
+  {% block extra_js %}
+  <!-- importações e scripts js serão adicionados aqui -->
+  {% endblock %}
 </body>
 
 </html>

@@ -12,14 +12,6 @@ class Palavra(models.Model):
         blank=True,
         related_name='palavras'
     )
-    dificuldade = models.PositiveSmallIntegerField(
-        'Dificuldade', default=1,
-        choices=[
-            (1, 'Fácil'),
-            (2, 'Médio'),
-            (3, 'Difícil'),
-        ]
-    )
 
     class Meta:
         verbose_name = 'Palavra'

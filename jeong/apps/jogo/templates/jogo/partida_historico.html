@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Histórico da Partida • Jeong
+{% endblock %}
+
+{% block content %}
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="bg-white rounded-4 shadow p-4 p-md-5" style="background-color: var(--bg-principal); color: var(--texto-principal);">
+          <h2 class="mb-4 text-center text-[var(--cor-primaria)] fw-bold">Histórico da Partida</h2>
+
+          <dl class="row mb-4">
+            <dt class="col-sm-5">Palavra</dt>
+            <dd class="col-sm-7 fs-3 fw-bold">{{ partida.palavra.texto }}</dd>
+
+            <dt class="col-sm-5">Status</dt>
+            <dd class="col-sm-7">
+              {% if partida.status == 'vitoria' %}
+                <span class="badge bg-success">Vitória</span>
+              {% elif partida.status == 'derrota' %}
+                <span class="badge bg-danger">Derrota</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ partida.get_status_display }}</span>
+              {% endif %}
+            </dd>
+
+            <dt class="col-sm-5">Pontuação</dt>
+            <dd class="col-sm-7">{{ partida.pontuacao }}</dd>
+
+            <dt class="col-sm-5">Tentativas restantes</dt>
+            <dd class="col-sm-7">{{ partida.tentativas_restantes }}</dd>
+
+            <dt class="col-sm-5">Letras tentadas</dt>
+            <dd class="col-sm-7">
+              {% if partida.letras_tentadas %}
+                {{ partida.letras_tentadas|join:', ' }}
+              {% else %}
+                <span class="text-muted">Nenhuma</span>
+              {% endif %}
+            </dd>
+
+            <dt class="col-sm-5">Início</dt>
+            <dd class="col-sm-7">{{ partida.data_inicio|date:'d/m/Y H:i' }}</dd>
+
+            <dt class="col-sm-5">Fim</dt>
+            <dd class="col-sm-7">{{ partida.data_fim|date:'d/m/Y H:i' }}</dd>
+          </dl>
+
+          <div class="text-center">
+            <a href="{% url 'jogo:partida_nova' %}" class="btn btn-primary" style="background-color: var(--cor-primaria); border: none;">Nova Partida</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
